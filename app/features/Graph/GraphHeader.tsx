@@ -18,20 +18,38 @@ export default function GraphHeader() {
     setLoading(true);
     try {
       console.log('🔍 Searching for:', query);
-      const response = await fetch(`https://researchmapperbackendserver-production.up.railway.app/search?query=${encodeURIComponent(query)}`);
+      console.log('📡 API URL:', `https://researchmapperbackendserver-production.up.railway.app/search?query=${encodeURIComponent(query)}`);
+      
+      const response = await fetch(`https://researchmapperbackendserver-production.up.railway.app/search?query=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response headers:', response.headers);
       
       if (!response.ok) {
-        throw new Error(`Search API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ API Error Response:', errorText);
+        throw new Error(`Search API error: ${response.status} - ${errorText}`);
       }
       
       const data = await response.json();
       console.log('✅ Search result:', data);
       
+      if (!data.title) {
+        throw new Error('No title in response');
+      }
+      
       // Force page reload with paper parameter to trigger search
       window.location.href = `/GraphPage?paper=${encodeURIComponent(data.title)}`;
-    } catch (error) {
-      console.error('❌ Error searching:', error);
-      alert('Failed to search. Please try again.');
+    } catch (error: any) {
+      console.error('❌ FULL Error:', error);
+      console.error('❌ Error message:', error?.message);
+      console.error('❌ Error stack:', error?.stack);
+      alert(`Failed to search: ${error?.message || 'Unknown error'}`);
       setLoading(false);
     }
   };

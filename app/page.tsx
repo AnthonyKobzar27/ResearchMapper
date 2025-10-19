@@ -19,13 +19,27 @@ export default function HomePage() {
     setLoading(true)
     try {
       // Call the API to get the most similar paper
+      console.log('🔍 Homepage search:', query)
       const response = await fetch(`https://researchmapperbackendserver-production.up.railway.app/search?query=${encodeURIComponent(query)}`)
+      
+      console.log('📥 Response status:', response.status)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ API Error:', errorText)
+        alert(`Search failed: ${response.status}`)
+        router.push('/GraphPage')
+        return
+      }
+      
       const data = await response.json()
+      console.log('✅ Search result:', data)
       
       // Navigate to graph page with the paper title
       router.push(`/GraphPage?paper=${encodeURIComponent(data.title)}`)
-    } catch (error) {
-      console.error('Error searching:', error)
+    } catch (error: any) {
+      console.error('❌ Error searching:', error)
+      alert(`Search error: ${error?.message || 'Unknown error'}`)
       // Navigate to graph page anyway
       router.push('/GraphPage')
     } finally {
