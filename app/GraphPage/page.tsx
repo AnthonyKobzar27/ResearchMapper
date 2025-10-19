@@ -14,6 +14,8 @@ export default function GraphPage() {
   const { setData } = useGraphStore()
   const targetPaper = searchParams.get('paper')
   
+  console.log('🎯 GraphPage - Target paper from URL:', targetPaper)
+  
   useEffect(() => {
     const loadData = async () => {
       console.log('📊 Starting to fetch research papers...')

@@ -48,34 +48,49 @@ const ResearchGraphCanvas = ({ focusPaperTitle }: GraphCanvasProps) => {
   const [hasFocused, setHasFocused] = useState(false);
   
   useEffect(() => {
-    if (focusPaperTitle && filteredData.nodes.length > 0 && graphRef.current && !hasFocused) {
-      console.log('🔍 Searching for paper:', focusPaperTitle);
+    if (!focusPaperTitle || filteredData.nodes.length === 0 || hasFocused) {
+      return;
+    }
+    
+    console.log('🔍🔍🔍 AUTO-FOCUS STARTING!', focusPaperTitle);
+    
+    // Wait for graph to be ready
+    const timer = setTimeout(() => {
+      console.log('⏰ Timer fired, searching for node...');
       
-      // Find the node by title (case insensitive search)
-      const targetNode = filteredData.nodes.find(node => 
-        node.title?.toLowerCase().includes(focusPaperTitle.toLowerCase()) ||
-        node.name?.toLowerCase().includes(focusPaperTitle.toLowerCase())
-      );
+      // Find the node by title (case insensitive, partial match)
+      const targetNode = filteredData.nodes.find(node => {
+        const nodeTitle = (node.title || node.name || '').toLowerCase();
+        const searchTitle = focusPaperTitle.toLowerCase();
+        
+        // Try exact match first
+        if (nodeTitle === searchTitle) return true;
+        
+        // Try includes (partial match)
+        if (nodeTitle.includes(searchTitle) || searchTitle.includes(nodeTitle)) return true;
+        
+        // Try first 30 characters (in case of truncation)
+        if (nodeTitle.substring(0, 30) === searchTitle.substring(0, 30)) return true;
+        
+        return false;
+      });
       
       if (targetNode) {
-        console.log('✅ Found node, triggering click:', targetNode.title);
-        setHasFocused(true); // Prevent re-focusing
+        console.log('✅✅✅ FOUND NODE!', targetNode.title);
+        setHasFocused(true);
         
-        // Small delay to ensure graph is fully rendered
-        setTimeout(() => {
-          handleNodeClick(targetNode);
-          setSelectedNode(targetNode);
-          
-          // Clear URL parameter after focusing
-          window.history.replaceState({}, '', '/GraphPage');
-        }, 500);
+        // JUST ZOOM AND SHOW MODAL - NO ROUTER BULLSHIT!
+        handleNodeClick(targetNode);
+        setSelectedNode(targetNode);
       } else {
-        console.log('❌ Node not found for:', focusPaperTitle);
-        // Clear URL parameter even if not found
-        window.history.replaceState({}, '', '/GraphPage');
+        console.error('❌❌❌ NODE NOT FOUND!', focusPaperTitle);
+        console.log('Available titles:', filteredData.nodes.slice(0, 3).map(n => n.title || n.name));
+        setHasFocused(true);
       }
-    }
-  }, [focusPaperTitle, filteredData.nodes, graphRef, hasFocused]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [focusPaperTitle, filteredData.nodes, hasFocused, handleNodeClick, setSelectedNode]);
   
   // Reset hasFocused when focusPaperTitle changes
   useEffect(() => {
