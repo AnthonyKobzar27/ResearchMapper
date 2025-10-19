@@ -18,7 +18,7 @@ export default function GraphHeader() {
     setLoading(true);
     try {
       console.log('🔍 Searching for:', query);
-      const response = await fetch(`http://localhost:8000/search?query=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://researchmapperbackendserver-production.up.railway.app/search?query=${encodeURIComponent(query)}`);
       
       if (!response.ok) {
         throw new Error(`Search API error: ${response.status}`);

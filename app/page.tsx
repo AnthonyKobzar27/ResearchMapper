@@ -19,7 +19,7 @@ export default function HomePage() {
     setLoading(true)
     try {
       // Call the API to get the most similar paper
-      const response = await fetch(`http://localhost:8000/search?query=${encodeURIComponent(query)}`)
+      const response = await fetch(`https://researchmapperbackendserver-production.up.railway.app/search?query=${encodeURIComponent(query)}`)
       const data = await response.json()
       
       // Navigate to graph page with the paper title
