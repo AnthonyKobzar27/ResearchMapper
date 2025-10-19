@@ -75,7 +75,7 @@ const ResearchGraphCanvas = ({ focusPaperTitle }: GraphCanvasProps) => {
         window.history.replaceState({}, '', '/GraphPage');
       }
     }
-  }, [focusPaperTitle, filteredData.nodes, graphRef, handleNodeClick, setSelectedNode, hasFocused]);
+  }, [focusPaperTitle, filteredData.nodes, graphRef, hasFocused]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Reset hasFocused when focusPaperTitle changes
   useEffect(() => {
